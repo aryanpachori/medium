@@ -1,7 +1,9 @@
+import { createPostInput, UpdatePostType } from "./../../../common/src/index";
 import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
 import { Hono } from "hono";
 import { verify } from "hono/jwt";
+import { updatePostInput } from "../../../common/src";
 
 const blog = new Hono<{
   Bindings: {
@@ -26,11 +28,20 @@ blog.use("/*", async (c, next) => {
 });
 
 blog.post("/blog", async (c) => {
+  const body = await c.req.json();
+  const { success } = createPostInput.safeParse(body);
+  if (!success) {
+    c.status(411);
+    return c.json({
+      message: "Inputs not correct",
+    });
+  }
+
   const userId = c.get("userId");
   const primsa = new PrismaClient({
     datasourceUrl: c.env?.DATABASE_URL,
   }).$extends(withAccelerate());
-  const body = await c.req.json();
+
   const post = primsa.post.create({
     data: {
       title: body.title,
@@ -44,11 +55,19 @@ blog.post("/blog", async (c) => {
 });
 
 blog.put("/blog", async (c) => {
+  const body = await c.req.json();
+  const { success } = updatePostInput.safeParse(body);
+  if (!success) {
+    c.status(411);
+    return c.json({
+      message: "Inputs not correct",
+    });
+  }
   const userId = c.get("userId");
   const prisma = new PrismaClient({
     datasourceUrl: c.env.DATABASE_URL,
   }).$extends(withAccelerate());
-  const body = await c.req.json();
+
   const post = await prisma.post.update({
     where: {
       id: body.id,
