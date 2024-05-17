@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 
 export const Blog = () => {
   const {id} = useParams();
-  const { loading, blog } = useBlog({
+  const { loading } = useBlog({
     id : id || ""
   });
   if (loading) {
