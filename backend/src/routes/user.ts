@@ -1,7 +1,5 @@
-import { signinInput, signupInput } from "./../../../common/src/index";
-
 import { Hono } from "hono";
-import { Prisma, PrismaClient } from "@prisma/client/edge";
+import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
 import { sign } from "hono/jwt";
 const user = new Hono<{
@@ -13,13 +11,6 @@ const user = new Hono<{
 
 user.post("/signup", async (c) => {
   const body = await c.req.json();
-  const { success } = signupInput.safeParse(body);
-  if (!success) {
-    c.status(411);
-    return c.json({
-      message: "Inputs not correct",
-    });
-  }
 
   const prisma = new PrismaClient({
     datasourceUrl: c.env?.DATABASE_URL,
@@ -28,6 +19,7 @@ user.post("/signup", async (c) => {
   try {
     const user = await prisma.user.create({
       data: {
+        name : body.name,
         email: body.email,
         password: body.password,
       },
@@ -42,13 +34,7 @@ user.post("/signup", async (c) => {
 
 user.post("/signin", async (c) => {
   const body = await c.req.json();
-  const { success } = signinInput.safeParse(body);
-  if (!success) {
-    c.status(411);
-    return c.json({
-      message: "Inputs not correct",
-    });
-  }
+
   const prisma = new PrismaClient({
     datasourceUrl: c.env.DATABASE_URL,
   }).$extends(withAccelerate());
