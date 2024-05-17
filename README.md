@@ -1,4 +1,4 @@
-The stack :
+The stack :<br/>
 React in the frontend
 Cloudflare workers in the backend
 zod as the validation library, type inference for the frontend types
