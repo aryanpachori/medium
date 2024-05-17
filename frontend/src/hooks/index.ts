@@ -2,13 +2,13 @@ import { BACKEND_URL } from "@/config";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
-interface post{
-content : string,
-title : string,
-id : string,
-author :{
-  name : string
-}
+interface post {
+  content: string;
+  title: string;
+  id: string;
+  author: {
+    name: string;
+  };
 }
 
 export const useBlogs = () => {
@@ -26,9 +26,31 @@ export const useBlogs = () => {
         setBlogs(response.data.post);
         setLoading(false);
       });
-  });
+  }, []);
   return {
     loading,
     blogs,
+  };
+};
+
+export const useBlog = ({ id }: { id: string }) => {
+  const [loading, setLoading] = useState(true);
+  const [blog, setBlog] = useState();
+
+  useEffect(() => {
+    axios
+      .get(`${BACKEND_URL}/api/v1/blog/bulk/${id}`, {
+        headers: {
+          Authorization: localStorage.getItem("token"),
+        },
+      })
+      .then((response) => {
+        setBlog(response.data.blog);
+        setLoading(false);
+      });
+  }, [id]);
+  return {
+    loading,
+    blog,
   };
 };

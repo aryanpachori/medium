@@ -78,11 +78,11 @@ blog.get("/blog/bulk", async (c) => {
       content: true,
       title: true,
       id: true,
-      author : {
-        select :{
-          name : true
-        }
-      }
+      author: {
+        select: {
+          name: true,
+        },
+      },
     },
   });
 
@@ -99,6 +99,16 @@ blog.get("/blog/:id", async (c) => {
   const blog = await prisma.post.findUnique({
     where: {
       id,
+    },
+    select: {
+      id : true,
+      title: true,
+      content: true,
+      author: {
+        select: {
+          name: true,
+        },
+      },
     },
   });
   return c.json(blog);
